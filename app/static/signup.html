@@ -403,7 +403,9 @@
             if (response.ok) {
                 // alert('Login successful!');
                 document.getElementById('loginForm').reset();
-                if (response.data.is_admin === true) {
+                const data = await response.json();
+                console.log(data);
+                if (data.is_admin === true) {
                     window.location.href = '/admin';
                 } else {
                     window.location.href = '/dashboard';
