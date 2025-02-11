@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FitnesPro - Get Stronger</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #FF6B35;
+            --secondary: #FF3C38;
+            --dark: #1A1A1A;
+            --accent: #4CAF50;
+            --light: #FFFFFF;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(45deg, #2D2D2D, #1A1A1A);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Background Elements */
+        .background-elements {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        .background-elements::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: url('https://source.unsplash.com/1600x900/?gym') center/cover;
+            filter: blur(20px) brightness(0.4);
+            transform: rotate(-5deg);
+        }
+
+        .motivation-text {
+            position: absolute;
+            color: rgba(255,255,255,0.05);
+            font-size: 8rem;
+            font-weight: 900;
+            transform: rotate(-15deg);
+            user-select: none;
+        }
+
+        /* Auth Container */
+        .auth-container {
+            background: rgba(30, 30, 30, 0.95);
+            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            width: 90%;
+            max-width: 450px;
+            z-index: 1;
+            position: relative;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo {
+            color: var(--primary);
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .tagline {
+            color: rgba(255,255,255,0.8);
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            color: rgba(255,255,255,0.8);
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            background: rgba(255,255,255,0.05);
+            color: var(--light);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            border-color: var(--primary);
+            outline: none;
+            background: rgba(255,107,53,0.05);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin: 1rem 0;
+        }
+
+        .checkbox-group input {
+            width: auto;
+            margin-right: 0.5rem;
+        }
+
+        /* Buttons */
+        .btn {
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: var(--light);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255,107,53,0.3);
+        }
+
+        .btn-social {
+            background: rgba(255,255,255,0.1);
+            color: var(--light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin: 0.5rem 0;
+        }
+
+        .btn-social.google { color: #4285F4; }
+        .btn-social.facebook { color: #4267B2; }
+
+        /* Links */
+        .auth-links {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: rgba(255,255,255,0.7);
+        }
+
+        .auth-links a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        /* Loading State */
+        .btn-loading {
+            position: relative;
+            pointer-events: none;
+            opacity: 0.8;
+        }
+
+        .btn-loading::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-top-color: var(--light);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            right: 1rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 480px) {
+            .auth-container {
+                padding: 1.5rem;
+            }
+            
+            .logo {
+                font-size: 2rem;
+            }
+            
+            .motivation-text {
+                font-size: 4rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background-elements">
+        <div class="motivation-text" style="top: 10%; left: -20%;">STRONGER</div>
+        <div class="motivation-text" style="bottom: 10%; right: -20%;">FITTER</div>
+    </div>
+
+    <!-- Login Container -->
+    <div class="auth-container" id="loginContainer">
+        <div class="header">
+            <div class="logo">FitnesPro</div>
+            <div class="tagline">Log In and Get Closer to Your Fitness Goals</div>
+        </div>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" required placeholder="Enter your email">
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" required placeholder="••••••••">
+            </div>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="remember">
+                <label for="remember">Remember Me</label>
+            </div>
+
+            <button type="submit" class="btn btn-primary" id="loginBtn">Log In</button>
+            
+            <div class="auth-links">
+                <a href="#" id="forgotPassword">Forgot Password?</a>
+                <p>New to FitnesPro? <a href="#" id="showSignup">Sign Up Now</a></p>
+            </div>
+        </form>
+    </div>
+
+    <!-- Signup Container (Hidden by default) -->
+    <div class="auth-container" id="signupContainer" style="display: none;">
+        <div class="header">
+            <div class="logo">FitnesPro</div>
+            <div class="tagline">Start Your Fitness Journey Today!</div>
+        </div>
+
+        <form id="signupForm">
+            <div class="form-group">
+                <label for="fullname">Full Name</label>
+                <input type="text" id="fullname" required placeholder="Enter your full name">
+            </div>
+
+            <div class="form-group">
+                <label for="signupEmail">Email</label>
+                <input type="email" id="signupEmail" required placeholder="Enter your email">
+            </div>
+
+            <div class="form-group">
+                <label for="signupPassword">Password</label>
+                <input type="password" id="signupPassword" required placeholder="••••••••">
+            </div>
+
+            <div class="form-group">
+                <label for="confirmPassword">Confirm Password</label>
+                <input type="password" id="confirmPassword" required placeholder="••••••••">
+            </div>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="terms" required>
+                <label for="terms">I agree to the Terms and Conditions</label>
+            </div>
+
+            <button type="submit" class="btn btn-primary" id="signupBtn">Sign Up</button>
+
+            <div class="auth-links">
+                <p>Or sign up with</p>
+                <button class="btn btn-social google">
+                    <i class="fab fa-google"></i> Google
+                </button>
+                <button class="btn btn-social facebook">
+                    <i class="fab fa-facebook"></i> Facebook
+                </button>
+                <p>Already have an account? <a href="#" id="showLogin">Log In</a></p>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Toggle Between Login/Signup
+        const loginContainer = document.getElementById('loginContainer');
+        const signupContainer = document.getElementById('signupContainer');
+        
+        document.getElementById('showSignup').addEventListener('click', (e) => {
+            e.preventDefault();
+            loginContainer.style.display = 'none';
+            signupContainer.style.display = 'block';
+        });
+
+        document.getElementById('showLogin').addEventListener('click', (e) => {
+            e.preventDefault();
+            signupContainer.style.display = 'none';
+            loginContainer.style.display = 'block';
+        });
+
+        // Form Validation
+        document.getElementById('signupForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const password = document.getElementById('signupPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            if(password !== confirmPassword) {
+                alert('Passwords do not match!');
+                return;
+            
+            }
+            signupUser();
+            
+            simulateLoading(document.getElementById('signupBtn'));
+        });
+        // Signup Function
+    async function signupUser() {
+        const username = document.getElementById('fullname').value;
+        const email = document.getElementById('signupEmail').value;
+        const password = document.getElementById('signupPassword').value;
+
+        const response = await fetch('/api/signup', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ username, email, password })
+        });
+
+        if (response.ok) {
+        alert('Signup successful!');
+        document.getElementById('signupForm').reset();
+        signupContainer.style.display = 'none';
+        loginContainer.style.display = 'block';
+        } else {
+        const errorData = await response.json();
+        alert(`Signup failed: ${errorData.message}`);
+        }
+    }
+
+        // document.getElementById('signupForm').addEventListener('submit', (e) => {
+        //     e.preventDefault();
+        //     const password = document.getElementById('signupPassword').value;
+        //     const confirmPassword = document.getElementById('confirmPassword').value;
+
+        //     if (password !== confirmPassword) {
+        //     alert('Passwords do not match!');
+        //     return;
+        //     }
+
+        //     signupUser();
+        // });
+        document.getElementById('loginForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            simulateLoading(document.getElementById('loginBtn'));
+        });
+
+        // Loading Simulation
+        function simulateLoading(button) {
+            button.classList.add('btn-loading');
+            setTimeout(() => {
+                button.classList.remove('btn-loading');
+                // alert('Form submitted successfully!');
+            }, 1500);
+        }
+        
+        // Login Function
+        async function loginUser() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            const response = await fetch('/api/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email, password })
+            });
+
+            if (response.ok) {
+                // alert('Login successful!');
+                document.getElementById('loginForm').reset();
+                if (response.data.is_admin === true) {
+                    window.location.href = '/admin';
+                } else {
+                    window.location.href = '/dashboard';
+                }
+            } else {
+                const errorData = await response.json();
+                alert(`Login failed: ${errorData.message}`);
+            }
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            loginUser();
+        });
+        // Forgot Password
+        document.getElementById('forgotPassword').addEventListener('click', (e) => {
+            e.preventDefault();
+            const email = prompt('Please enter your email:');
+            if(email) {
+                alert(`Password reset link sent to ${email}`);
+            }
+        });
+    </script>
+</body>
+</html>

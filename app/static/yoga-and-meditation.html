@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Yoga and Meditation Programs</title>
+  <!-- Fonts and Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #FF6B35;
+      --secondary: #4CAF50;
+      --accent: #007BFF;
+      --dark: #1A1A1A;
+      --gray: #2D2D2D;
+      --light: #FFFFFF;
+    }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: var(--dark);
+      color: var(--light);
+      line-height: 1.6;
+    }
+    /* Header */
+    header {
+      background: var(--gray);
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1000;
+    }
+    header .logo {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    header nav a {
+      color: var(--light);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s ease;
+      margin-left: 1rem;
+    }
+    header nav a:hover {
+      color: var(--primary);
+    }
+    /* Main Container */
+    .container {
+      max-width: 1200px;
+      margin: 80px auto 2rem;
+      padding: 0 1rem;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 2rem;
+      color: var(--primary);
+    }
+    /* Program Cards */
+    .programs {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+    }
+    .program-card {
+      background: var(--light);
+      color: var(--dark);
+      padding: 1.5rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease;
+    }
+    .program-card:hover {
+      transform: translateY(-5px);
+    }
+    .program-card h2 {
+      font-size: 1.5rem;
+      margin-bottom: 0.8rem;
+      color: var(--primary);
+    }
+    .program-card p {
+      margin-bottom: 1rem;
+      font-size: 0.95rem;
+    }
+    .program-card ul {
+      margin-left: 1.2rem;
+      margin-bottom: 1rem;
+    }
+    .program-card li {
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+    }
+    .program-card .btn {
+      display: inline-block;
+      background: var(--primary);
+      color: var(--light);
+      padding: 0.7rem 1.2rem;
+      border: none;
+      border-radius: 5px;
+      text-decoration: none;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .program-card .btn:hover {
+      background: var(--accent);
+    }
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 2000;
+    }
+    .modal-content {
+      background: var(--light);
+      color: var(--dark);
+      margin: 15% auto;
+      padding: 2rem;
+      width: 80%;
+      max-width: 500px;
+      border-radius: 10px;
+      position: relative;
+    }
+    .modal-content .close {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .programs {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header with Home Button -->
+  <header>
+    <div class="logo">FitPro</div>
+    <nav>
+      <a href="index.html"><i class="fas fa-home"></i> Home</a>
+    </nav>
+  </header>
+  
+  <!-- Main Content Container -->
+  <div class="container">
+    <h1>Yoga and Meditation Programs</h1>
+    <div class="programs">
+      <!-- Program Card 1 -->
+      <div class="program-card">
+        <h2>Beginner Yoga Flow</h2>
+        <p>Start your yoga journey with this program designed to build flexibility, strength, and balance.</p>
+        <ul>
+          <li>3 sessions per week</li>
+          <li>Focus on foundational poses</li>
+          <li>Build flexibility and strength</li>
+        </ul>
+        <button class="btn" 
+                onclick="showProgramDetails(this)" 
+                data-title="Beginner Yoga Flow"
+                data-details="The Beginner Yoga Flow program introduces foundational yoga poses to build flexibility, strength, and balance. Perfect for newcomers, this program involves 3 sessions per week that emphasize proper alignment and breathing.">
+          Learn More
+        </button>
+      </div>
+      
+      <!-- Program Card 2 -->
+      <div class="program-card">
+        <h2>Power Yoga</h2>
+        <p>Boost your metabolism and build strength with this dynamic and fast-paced yoga program.</p>
+        <ul>
+          <li>4 sessions per week</li>
+          <li>Dynamic, fast-paced flows</li>
+          <li>Focus on strength and endurance</li>
+        </ul>
+        <button class="btn" 
+                onclick="showProgramDetails(this)" 
+                data-title="Power Yoga"
+                data-details="Power Yoga is a fast-paced, dynamic program designed to boost metabolism, increase endurance, and strengthen your muscles. With 4 sessions per week, this program challenges your body while improving flexibility.">
+          Learn More
+        </button>
+      </div>
+      
+      <!-- Program Card 3 -->
+      <div class="program-card">
+        <h2>Guided Meditation</h2>
+        <p>Relax your mind and reduce stress with guided meditation sessions for inner peace and mindfulness.</p>
+        <ul>
+          <li>5 sessions per week</li>
+          <li>Focus on mindfulness and stress relief</li>
+          <li>Short, guided meditations</li>
+        </ul>
+        <button class="btn" 
+                onclick="showProgramDetails(this)" 
+                data-title="Guided Meditation"
+                data-details="Guided Meditation sessions are designed to reduce stress, improve mindfulness, and promote inner peace. With 5 short sessions per week, you’ll enhance mental clarity and relaxation.">
+          Learn More
+        </button>
+      </div>
+      
+      <!-- Program Card 4 -->
+      <div class="program-card">
+        <h2>Restorative Yoga</h2>
+        <p>This gentle program focuses on relaxation, recovery, and stress relief through supported poses.</p>
+        <ul>
+          <li>2 sessions per week</li>
+          <li>Focus on recovery and relaxation</li>
+          <li>Gentle, supported poses</li>
+        </ul>
+        <button class="btn" 
+                onclick="showProgramDetails(this)" 
+                data-title="Restorative Yoga"
+                data-details="Restorative Yoga is a gentle program focusing on deep relaxation, recovery, and stress relief. With just 2 sessions per week, you’ll engage in supported poses that calm the mind and body.">
+          Learn More
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Modal Container -->
+  <div id="modal-container" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <h2 id="modal-title"></h2>
+      <p id="modal-details"></p>
+    </div>
+  </div>
+  
+  <!-- JavaScript for Modal Functionality -->
+  <script>
+    // Function to show modal with program details
+    function showProgramDetails(button) {
+      const title = button.getAttribute('data-title');
+      const details = button.getAttribute('data-details');
+      document.getElementById('modal-title').textContent = title;
+      document.getElementById('modal-details').textContent = details;
+      document.getElementById('modal-container').style.display = 'block';
+    }
+
+    // Function to close modal
+    function closeModal() {
+      document.getElementById('modal-container').style.display = 'none';
+    }
+  </script>
+</body>
+</html>

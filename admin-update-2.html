@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FitPro Admin Dashboard</title>
+  <!-- Fonts and Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --primary: #FF6B35;
+      --secondary: #4CAF50;
+      --accent: #007BFF;
+      --dark: #1A1A1A;
+      --gray: #2D2D2D;
+      --light: #FFFFFF;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: var(--dark);
+      color: var(--light);
+    }
+    
+    /* Header */
+    .header {
+      background: var(--gray);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 1000;
+    }
+    
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+    }
+    
+    .nav-links a {
+      color: var(--light);
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+    
+    .nav-links a:hover {
+      color: var(--primary);
+    }
+    
+    .notification-bell {
+      position: relative;
+      cursor: pointer;
+    }
+    
+    .notification-bell::after {
+      content: '3';
+      position: absolute;
+      top: -5px;
+      right: -10px;
+      background: var(--accent);
+      color: var(--light);
+      font-size: 0.8rem;
+      padding: 0.2rem 0.4rem;
+      border-radius: 50%;
+    }
+    
+    /* Sidebar */
+    .sidebar {
+      background: var(--gray);
+      width: 250px;
+      height: 100vh;
+      position: fixed;
+      top: 60px;
+      left: 0;
+      padding: 1.5rem;
+      overflow-y: auto;
+    }
+    
+    .sidebar a {
+      display: block;
+      color: var(--light);
+      text-decoration: none;
+      padding: 0.8rem 0;
+      transition: color 0.3s ease;
+    }
+    
+    .sidebar a:hover,
+    .sidebar a.active {
+      color: var(--primary);
+      font-weight: bold;
+    }
+    
+    .sidebar i {
+      margin-right: 0.8rem;
+    }
+    
+    /* Main Content */
+    .main-content {
+      margin-left: 250px;
+      margin-top: 60px;
+      padding: 2rem;
+    }
+    
+    /* Section Containers */
+    .section {
+      display: none;
+    }
+    
+    /* Default dashboard section styling */
+    #dashboard {
+      display: block;
+    }
+    
+    /* Metrics */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    
+    .metric-card {
+      background: var(--light);
+      color: var(--dark);
+      padding: 1.5rem;
+      border-radius: 10px;
+      text-align: center;
+    }
+    
+    .metric-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin: 0.5rem 0;
+    }
+    
+    /* Table Styles for User Management */
+    .table-container {
+      background: var(--light);
+      color: var(--dark);
+      padding: 1.5rem;
+      border-radius: 10px;
+      margin-bottom: 2rem;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    th, td {
+      padding: 1rem;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+    
+    th {
+      background: var(--primary);
+      color: var(--light);
+    }
+    
+    .action-btn {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .edit-btn {
+      background: var(--accent);
+      color: var(--light);
+    }
+    
+    .delete-btn {
+      background: var(--secondary);
+      color: var(--light);
+    }
+    
+    /* Analytics Section (Charts) */
+    .analytics-section {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      margin-top: 2rem;
+    }
+    
+    .chart-card {
+      background: var(--light);
+      color: var(--dark);
+      padding: 1.5rem;
+      border-radius: 10px;
+      flex: 1;
+      min-width: 300px;
+    }
+    
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+    }
+    
+    .modal-content {
+      background: var(--light);
+      margin: 15% auto;
+      padding: 2rem;
+      width: 80%;
+      max-width: 500px;
+    }
+    
+    /* Toast Notifications */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      padding: 1rem 2rem;
+      border-radius: 5px;
+      color: white;
+      z-index: 1000;
+    }
+    
+    .toast.success { background: var(--secondary); }
+    .toast.error { background: var(--accent); }
+    
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+        top: 0;
+      }
+      .main-content {
+        margin-left: 0;
+      }
+      .metrics-grid {
+        grid-template-columns: 1fr;
+      }
+      .analytics-section {
+        flex-direction: column;
+      }
+    }
+        /* Add form styles */
+        .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: var(--dark);
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 0.8rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      background: white;
+      color: var(--dark);
+    }
+
+    .form-actions {
+      margin-top: 1.5rem;
+      display: flex;
+      gap: 1rem;
+      justify-content: flex-end;
+    }
+
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="logo">FitPro Admin</div>
+    <nav class="nav-links">
+      <a href="#"><i class="fas fa-bell notification-bell"></i></a>
+      <a href="#">Logout</a>
+    </nav>
+  </header>
+  
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <a href="#" class="sidebar-link" id="link-dashboard" onclick="openSection('dashboard')">
+      <i class="fas fa-tachometer-alt"></i> Dashboard
+    </a>
+    <a href="#" class="sidebar-link" id="link-manage-users" onclick="openSection('manage-users')">
+      <i class="fas fa-users"></i> Manage Users
+    </a>
+    <a href="#" class="sidebar-link" id="link-manage-trainers" onclick="openSection('manage-trainers')">
+      <i class="fas fa-user-tie"></i> Manage Trainers
+    </a>
+    <a href="#" class="sidebar-link" id="link-manage-programs" onclick="openSection('manage-programs')">
+      <i class="fas fa-dumbbell"></i> Manage Programs
+    </a>
+    <a href="#" class="sidebar-link" id="link-reports" onclick="openSection('reports')">
+      <i class="fas fa-chart-line"></i> Reports
+    </a>
+    <a href="#" class="sidebar-link" id="link-feedback" onclick="openSection('feedback')">
+      <i class="fas fa-comments"></i> Feedback
+    </a>
+    <a href="#" class="sidebar-link" id="link-settings" onclick="openSection('settings')">
+      <i class="fas fa-cog"></i> Settings
+    </a>
+  </aside>
+  
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Dashboard Section -->
+    <div id="dashboard" class="section">
+      <h2>Dashboard Overview</h2>
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <i class="fas fa-users fa-2x"></i>
+          <div class="metric-value" id="total-users">0</div>
+          <div class="metric-label">Total Users</div>
+        </div>
+        <div class="metric-card">
+          <i class="fas fa-dumbbell fa-2x"></i>
+          <div class="metric-value" id="active-programs">0</div>
+          <div class="metric-label">Active Programs</div>
+        </div>
+        <div class="metric-card">
+          <i class="fas fa-dollar-sign fa-2x"></i>
+          <div class="metric-value" id="monthly-revenue">$0</div>
+          <div class="metric-label">Monthly Revenue</div>
+        </div>
+        <div class="metric-card">
+          <i class="fas fa-comments fa-2x"></i>
+          <div class="metric-value" id="feedback-count">0</div>
+          <div class="metric-label">Feedback Received</div>
+        </div>
+      </div>
+      <div class="analytics-section">
+        <div class="chart-card">
+          <h3>Monthly Signups</h3>
+          <canvas id="signupsChart"></canvas>
+        </div>
+        <div class="chart-card">
+          <h3>Revenue Trends</h3>
+          <canvas id="revenueChart"></canvas>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Manage Users Section -->
+    <div id="manage-users" class="section" style="display:none;">
+      <h2>User Management</h2>
+      <div class="table-container">
+        <div class="table-header">
+          <div class="controls">
+            <input type="text" id="user-search" placeholder="Search users...">
+            <button class="btn" onclick="showUserModal()">Add New User</button>
+          </div>
+        </div>
+        <table id="users-table">
+          <thead>
+            <tr>
+              <th>Username</th>
+              <th>Email</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Dynamically populated -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+    
+    <!-- Manage Trainers Section -->
+    <div id="manage-trainers" class="section" style="display:none;">
+      <h2>Trainer Management</h2>
+      <div class="table-container">
+        <div class="table-header">
+          <div class="controls">
+            <button class="btn" onclick="showTrainerModal()">Add New Trainer</button>
+          </div>
+        </div>
+        <table id="trainers-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Specialization</th>
+              <th>Contact Info</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Dynamically populated -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+    
+    <!-- Manage Programs Section -->
+    <div id="manage-programs" class="section" style="display:none;">
+      <h2>Program Management</h2>
+      <div class="table-container">
+        <div class="table-header">
+          <div class="controls">
+            <button class="btn" onclick="showProgramModal()">Add New Program</button>
+          </div>
+        </div>
+        <table id="programs-table">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Description</th>
+              <th>Progress</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Dynamically populated -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+    
+    <!-- Reports Section -->
+    <div id="reports" class="section" style="display:none;">
+      <h2>Reports</h2>
+      <div class="analytics-section">
+        <div class="chart-card">
+          <h3>Monthly Signups</h3>
+          <canvas id="reports-signupsChart"></canvas>
+        </div>
+        <div class="chart-card">
+          <h3>Revenue Trends</h3>
+          <canvas id="reports-revenueChart"></canvas>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Feedback Section -->
+    <div id="feedback" class="section" style="display:none;">
+      <h2>Feedback</h2>
+      <div class="table-container">
+        <table id="feedback-table">
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Feedback</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Dynamically populated -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+    
+    <!-- Settings Section -->
+    <div id="settings" class="section" style="display:none;">
+      <h2>Settings</h2>
+      <p>Settings content goes here. Administrators can adjust dashboard configurations, theme, and other system parameters.</p>
+    </div>
+  </main>
+  
+  <!-- Modal Template -->
+  <div id="modal-container" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <div id="modal-body"></div>
+    </div>
+  </div>
+
+  <!-- Form Templates -->
+  <template id="user-form-template">
+    <form id="user-form" onsubmit="handleUserForm(event)">
+      <h2>Add/Edit User</h2>
+      <div class="form-group">
+        <label class="form-label" for="user-username">Username</label>
+        <input class="form-input" type="text" id="user-username" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="user-email">Email</label>
+        <input class="form-input" type="email" id="user-email" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="user-password">Password</label>
+        <input class="form-input" type="password" id="user-password" required>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn" onclick="closeModal()">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save User</button>
+      </div>
+    </form>
+  </template>
+
+  <template id="trainer-form-template">
+    <form id="trainer-form" onsubmit="handleTrainerForm(event)">
+      <h2>Add/Edit Trainer</h2>
+      <div class="form-group">
+        <label class="form-label" for="trainer-name">Name</label>
+        <input class="form-input" type="text" id="trainer-name" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="trainer-specialization">Specialization</label>
+        <input class="form-input" type="text" id="trainer-specialization" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="trainer-contact">Contact Info</label>
+        <input class="form-input" type="text" id="trainer-contact" required>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn" onclick="closeModal()">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save Trainer</button>
+      </div>
+    </form>
+  </template>
+
+  <template id="program-form-template">
+    <form id="program-form" onsubmit="handleProgramForm(event)">
+      <h2>Add/Edit Program</h2>
+      <div class="form-group">
+        <label class="form-label" for="program-title">Title</label>
+        <input class="form-input" type="text" id="program-title" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="program-description">Description</label>
+        <textarea class="form-input" id="program-description" rows="3" required></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="program-duration">Duration (minutes)</label>
+        <input class="form-input" type="number" id="program-duration" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="program-calories">Calories Burned</label>
+        <input class="form-input" type="number" id="program-calories" required>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn" onclick="closeModal()">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save Program</button>
+      </div>
+    </form>
+  </template>
+
+  <script>
+    // Mock Data
+    const mockData = {
+      users: [
+        { id: 1, username: 'user1', email: 'user1@example.com', is_active: true },
+        { id: 2, username: 'user2', email: 'user2@example.com', is_active: false },
+      ],
+      trainers: [
+        { id: 1, name: 'Trainer 1', specialization: 'Yoga', contact_info: 'trainer1@example.com' },
+        { id: 2, name: 'Trainer 2', specialization: 'Weightlifting', contact_info: 'trainer2@example.com' },
+      ],
+      programs: [
+        { id: 1, title: 'Program 1', description: 'Description 1', progress: 50 },
+        { id: 2, title: 'Program 2', description: 'Description 2', progress: 75 },
+      ],
+      feedback: [
+        { user: 'user1', message: 'Great experience!', date: '2023-10-01' },
+        { user: 'user2', message: 'Needs improvement.', date: '2023-10-02' },
+      ],
+      metrics: {
+        totalUsers: 2,
+        activePrograms: 2,
+        monthlyRevenue: 5000,
+        feedbackCount: 2,
+      },
+    };
+
+    // Data Manager
+    class DataManager {
+      async fetchData(endpoint) {
+        return new Promise((resolve) => {
+          setTimeout(() => resolve(mockData[endpoint]), 500); // Simulate network delay
+        });
+      }
+    }
+
+    const dataManager = new DataManager();
+
+    // Load Functions
+    async function loadManageUsers() {
+      const users = await dataManager.fetchData('users');
+      const tbody = document.querySelector('#users-table tbody');
+      tbody.innerHTML = users.map(user => `
+        <tr data-user-id="${user.id}">
+          <td>${user.username}</td>
+          <td>${user.email}</td>
+          <td>${user.is_active ? 'Active' : 'Inactive'}</td>
+          <td>
+            <button class="action-btn edit-btn" onclick="editUser(${user.id})">Edit</button>
+            <button class="action-btn delete-btn" onclick="toggleUserStatus(${user.id}, ${user.is_active})">
+              ${user.is_active ? 'Deactivate' : 'Activate'}
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    async function loadManageTrainers() {
+      const trainers = await dataManager.fetchData('trainers');
+      const tbody = document.querySelector('#trainers-table tbody');
+      tbody.innerHTML = trainers.map(trainer => `
+        <tr data-trainer-id="${trainer.id}">
+          <td>${trainer.name}</td>
+          <td>${trainer.specialization}</td>
+          <td>${trainer.contact_info}</td>
+          <td>
+            <button class="action-btn edit-btn" onclick="editTrainer(${trainer.id})">Edit</button>
+            <button class="action-btn delete-btn" onclick="deleteTrainer(${trainer.id})">Delete</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    async function loadManagePrograms() {
+      const programs = await dataManager.fetchData('programs');
+      const tbody = document.querySelector('#programs-table tbody');
+      tbody.innerHTML = programs.map(program => `
+        <tr data-program-id="${program.id}">
+          <td>${program.title}</td>
+          <td>${program.description}</td>
+          <td>${program.progress}%</td>
+          <td>
+            <button class="action-btn edit-btn" onclick="editProgram(${program.id})">Edit</button>
+            <button class="action-btn delete-btn" onclick="deleteProgram(${program.id})">Delete</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    async function loadFeedback() {
+      const feedback = await dataManager.fetchData('feedback');
+      const tbody = document.querySelector('#feedback-table tbody');
+      tbody.innerHTML = feedback.map(fb => `
+        <tr>
+          <td>${fb.user}</td>
+          <td>${fb.message}</td>
+          <td>${fb.date}</td>
+        </tr>
+      `).join('');
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      openSection('dashboard');
+      loadManageUsers();
+      loadManageTrainers();
+      loadManagePrograms();
+      loadFeedback();
+    });
+  </script>
+</body>
+</html>

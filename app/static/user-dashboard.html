@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FitPro Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #FF6B35;
+            --secondary: #4CAF50;
+            --accent: #007BFF;
+            --dark: #1A1A1A;
+            --gray: #2D2D2D;
+            --light: #FFFFFF;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--dark);
+            color: var(--light);
+        }
+
+        .header {
+            background: var(--gray);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .notification-bell {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .notification-bell::after {
+            content: '3';
+            position: absolute;
+            top: -5px;
+            right: -10px;
+            background: var(--accent);
+            color: var(--light);
+            font-size: 0.8rem;
+            padding: 0.2rem 0.4rem;
+            border-radius: 50%;
+        }
+
+        .profile-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+        }
+
+        .sidebar {
+            background: var(--gray);
+            width: 250px;
+            height: 100vh;
+            position: fixed;
+            top: 60px;
+            left: 0;
+            padding: 1.5rem;
+            overflow-y: auto;
+        }
+
+        .tablink {
+            width: 100%;
+            background: none;
+            border: none;
+            color: var(--light);
+            text-align: left;
+            padding: 0.8rem 0;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .tablink:hover {
+            color: var(--primary);
+        }
+
+        .tablink.active {
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        .main-content {
+            margin-left: 250px;
+            margin-top: 60px;
+            padding: 2rem;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .metric-card {
+            background: var(--light);
+            color: var(--dark);
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 0.5rem 0;
+        }
+
+        .chart-container {
+            background: var(--light);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+        }
+
+        .programs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .program-card {
+            background: var(--light);
+            color: var(--dark);
+            padding: 1.5rem;
+            border-radius: 10px;
+            transition: transform 0.3s ease;
+        }
+
+        .program-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: #444;
+            border-radius: 4px;
+            margin: 1rem 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--primary);
+            border-radius: 4px;
+        }
+        .diet-plans {
+            background: var(--light);
+            color: var(--dark);
+            padding: 1.5rem;
+            border-radius: 10px;
+        }
+
+        .diet-plans h2 {
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+        }
+
+        .diet-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .diet-table th,
+        .diet-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .diet-table th {
+            background: var(--primary);
+            color: var(--light);
+            font-weight: 500;
+        }
+
+        .diet-table tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        .diet-table tr:hover {
+            background: #f1f1f1;
+        }
+
+        .diet-group {
+            margin-bottom: 2rem;
+        }
+
+        .diet-group h3 {
+            color: var(--secondary);
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                margin-left: 0;
+            }
+
+            .diet-table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+
+        .chatbot-icon {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--primary);
+            color: var(--light);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            z-index: 1000;
+        }
+
+        .chatbot-container {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            width: 300px;
+            background: var(--light);
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            display: none;
+            flex-direction: column;
+            z-index: 1000;
+        }
+
+        .chatbot-header {
+            background: var(--primary);
+            color: var(--light);
+            padding: 1rem;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chatbot-header h3 {
+            margin: 0;
+            font-size: 1rem;
+        }
+
+        .chatbot-header .close-btn {
+            cursor: pointer;
+        }
+
+        .chatbot-body {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            max-height: 300px;
+        }
+
+        .chatbot-message {
+            margin-bottom: 1rem;
+        }
+
+        .chatbot-message.user {
+            text-align: right;
+        }
+
+        .chatbot-message.bot {
+            text-align: left;
+        }
+
+        .chatbot-message p {
+            background: var(--gray);
+            color: var(--light);
+            padding: 0.5rem 1rem;
+            border-radius: 10px;
+            display: inline-block;
+            max-width: 80%;
+        }
+
+        .chatbot-input {
+            display: flex;
+            gap: 0.5rem;
+            padding: 1rem;
+            border-top: 1px solid #ddd;
+        }
+
+        .chatbot-input input {
+            flex: 1;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .chatbot-input button {
+            background: var(--primary);
+            color: var(--light);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .quick-replies {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .quick-reply {
+            background: var(--primary);
+            color: var(--light);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                top: 0;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">FitPro</div>
+        <nav class="nav-links">
+            <a href="#"><i class="fas fa-bell notification-bell"></i></a>
+            <div class="profile-avatar"></div>
+        </nav>
+    </header>
+
+    <aside class="sidebar">
+        <button class="tablink active" onclick="openTab(event, 'dashboard')" id="defaultOpen">
+            <i class="fas fa-tachometer-alt"></i> Dashboard
+        </button>
+        <button class="tablink" onclick="openTab(event, 'progress')">
+            <i class="fas fa-chart-line"></i> My Progress
+        </button>
+        <button class="tablink" onclick="openTab(event, 'programs')">
+            <i class="fas fa-dumbbell"></i> My Programs
+        </button>
+        <button class="tablink" onclick="openTab(event, 'diet')">
+            <i class="fas fa-utensils"></i> Diet Plans
+        </button>
+        <button class="tablink" onclick="openTab(event, 'community')">
+            <i class="fas fa-users"></i> Community
+        </button>
+        <button class="tablink" onclick="openTab(event, 'support')">
+            <i class="fas fa-question-circle"></i> Support
+        </button>
+    </aside>
+
+    <main class="main-content">
+        <div id="dashboard" class="tab-content" style="display: block;">
+            <div class="metrics-grid" id="metrics-grid"></div>
+            <div class="chart-container">
+                <h2>Weekly Progress</h2>
+                <canvas id="progressChart"></canvas>
+            </div>
+            <!-- <h2>My Active Programs</h2>
+            <div class="programs-grid" id="programs-grid"></div> -->
+        </div>
+
+        <div id="progress" class="tab-content">
+            <div class="chart-container">
+                <h2>Detailed Progress Analysis</h2>
+                <canvas id="detailedProgressChart"></canvas>
+            </div>
+        </div>
+
+        <div id="programs" class="tab-content">
+            <h2>Active Fitness Programs</h2>
+            <div class="programs-grid" id="all-programs-grid"></div>
+        </div>
+        <div id="diet" class="tab-content">
+                <div class="diet-plans">
+                    <h2>Diet Plans</h2>
+                    <div class="diet-group">
+                        <h3>Weight Loss</h3>
+                        <table class="diet-table">
+                            <thead>
+                                <tr>
+                                    <th>Meal Type</th>
+                                    <th>Food Items</th>
+                                    <th>Calories</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Breakfast</td>
+                                    <td>Oatmeal with berries, almond milk</td>
+                                    <td>300 kcal</td>
+                                </tr>
+                                <tr>
+                                    <td>Lunch</td>
+                                    <td>Grilled chicken salad with olive oil dressing</td>
+                                    <td>450 kcal</td>
+                                </tr>
+                                <tr>
+                                    <td>Dinner</td>
+                                    <td>Steamed vegetables with quinoa</td>
+                                    <td>350 kcal</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+    
+                    <div class="diet-group">
+                        <h3>Muscle Gain</h3>
+                        <table class="diet-table">
+                            <thead>
+                                <tr>
+                                    <th>Meal Type</th>
+                                    <th>Food Items</th>
+                                    <th>Calories</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Breakfast</td>
+                                    <td>Scrambled eggs with avocado toast</td>
+                                    <td>500 kcal</td>
+                                </tr>
+                                <tr>
+                                    <td>Lunch</td>
+                                    <td>Grilled salmon with sweet potatoes</td>
+                                    <td>600 kcal</td>
+                                </tr>
+                                <tr>
+                                    <td>Dinner</td>
+                                    <td>Beef steak with broccoli and rice</td>
+                                    <td>700 kcal</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+    
+                    <div class="diet-group">
+                        <h3>Endurance Training</h3>
+                        <table class="diet-table">
+                            <thead>
+                                <tr>
+                                    <th>Meal Type</th>
+                                    <th>Food Items</th>
+                                    <th>Calories</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Breakfast</td>
+                                    <td>Smoothie with banana, spinach, and protein powder</td>
+                                    <td>400 kcal</td>
+                                </tr>
+                                <tr>
+                                    <td>Lunch</td>
+                                    <td>Whole grain pasta with turkey meatballs</td>
+                                    <td>550 kcal</td>
+                                </tr>
+                                <tr>
+                                    <td>Dinner</td>
+                                    <td>Grilled chicken with roasted vegetables</td>
+                                    <td>500 kcal</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+    </main>
+
+    <div class="chatbot-icon" onclick="toggleChatbot()">
+        <i class="fas fa-comment-dots fa-2x"></i>
+    </div>
+
+    <div class="chatbot-container" id="chatbotContainer">
+        <div class="chatbot-header">
+            <h3>Fitness Assistant</h3>
+            <span class="close-btn" onclick="toggleChatbot()">×</span>
+        </div>
+        <div class="chatbot-body" id="chatbotBody">
+            <div class="chatbot-message bot">
+                <p>Hi there! How can I help you today?</p>
+            </div>
+            <div class="quick-replies">
+                <div class="quick-reply" onclick="sendQuickReply('Help me plan my workouts')">Plan Workouts</div>
+                <div class="quick-reply" onclick="sendQuickReply('Suggest a diet plan')">Diet Plan</div>
+                <div class="quick-reply" onclick="sendQuickReply('Track my calories today')">Track Calories</div>
+            </div>
+        </div>
+        <div class="chatbot-input">
+            <input type="text" id="chatbotInput" placeholder="Type a message...">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        // Dashboard functionality
+        let charts = {};
+        
+        async function fetchData(endpoint) {
+            try {
+                const response = await fetch(`/api/${endpoint}`);
+                return await response.json();
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+
+        function openTab(evt, tabName) {
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => content.style.display = 'none');
+            
+            const tabLinks = document.querySelectorAll('.tablink');
+            tabLinks.forEach(link => link.classList.remove('active'));
+            
+            document.getElementById(tabName).style.display = 'block';
+            evt.currentTarget.classList.add('active');
+            loadTabContent(tabName);
+        }
+
+        async function loadTabContent(tabName) {
+            switch(tabName) {
+                case 'dashboard':
+                    const [metrics, progress] = await Promise.all([
+                        fetchData('metrics'),
+                        fetchData('progress')
+                    ]);
+                    populateMetrics(metrics);
+                    initChart('progressChart', progress);
+                    break;
+                
+                case 'progress':
+                    const detailedProgress = await fetchData('detailed-progress');
+                    initChart('detailedProgressChart', detailedProgress);
+                    break;
+                
+                case 'programs':
+                    const programs = await fetchData('programs');
+                    populatePrograms(programs, 'all-programs-grid');
+                    break;
+            }
+        }
+
+        function populateMetrics(metrics) {
+            console.log(metrics);
+            const grid = document.getElementById('metrics-grid');
+            grid.innerHTML = metrics.map(metric => `
+                <div class="metric-card">
+                    <i class="${metric.icon} fa-2x"></i>
+                    <div class="metric-value">${metric.value}</div>
+                    <div class="metric-label">${metric.title}</div>
+                </div>
+            `).join('');
+        }
+
+        function initChart(chartId, data) {
+            if (charts[chartId]) charts[chartId].destroy();
+            
+            const ctx = document.getElementById(chartId).getContext('2d');
+            charts[chartId] = new Chart(ctx, {
+                type: data.type || 'line',
+                data: {
+                    labels: data.labels,
+                    datasets: data.datasets
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'top' }
+                    }
+                }
+            });
+        }
+
+        function populatePrograms(programs, containerId) {
+            const grid = document.getElementById(containerId);
+            grid.innerHTML = programs.map(program => `
+                <div class="program-card">
+                    <h3>${program.name}</h3>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${program.progress}%"></div>
+                    </div>
+                    <p>${program.progress}% Complete</p>
+                    <p>${program.description}</p>
+                    <button class="btn">View Details</button>
+                </div>
+            `).join('');
+        }
+
+        // Chatbot functionality
+        function toggleChatbot() {
+            const chatbotContainer = document.getElementById('chatbotContainer');
+            chatbotContainer.style.display = chatbotContainer.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chatbotInput');
+            const message = input.value.trim();
+            if (message) {
+                addMessage(message, 'user');
+                input.value = '';
+                setTimeout(() => {
+                    addMessage("I'll help you with that!", 'bot');
+                }, 500);
+            }
+        }
+
+        function sendQuickReply(reply) {
+            addMessage(reply, 'user');
+            setTimeout(() => {
+                addMessage("Here's what I found for you!", 'bot');
+            }, 500);
+        }
+
+        function addMessage(message, sender) {
+            const chatbotBody = document.getElementById('chatbotBody');
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('chatbot-message', sender);
+            messageDiv.innerHTML = `<p>${message}</p>`;
+            chatbotBody.appendChild(messageDiv);
+            chatbotBody.scrollTop = chatbotBody.scrollHeight;
+        }
+
+        // Initialize default tab
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('defaultOpen').click();
+        });
+    </script>
+</body>
+</html>
