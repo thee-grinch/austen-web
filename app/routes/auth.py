@@ -29,6 +29,22 @@ def create_access_token(data: dict):
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
+def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        email = payload.get("sub")
+        user = db.query(User).filter(User.email == email).first()
+        if not user:
+            raise HTTPException(status_code=401, detail="Invalid user")
+        return {
+            "username": user.username,
+            "email": user.email,
+            "is_admin": user.is_admin
+        }
+    except JWTError:
+        print("JWTError")
+        raise HTTPException(status_code=401, detail="Invalid token")
+
 @router.post("/signup")
 async def signup(user: userCreate, db: Session = Depends(get_db)):
     print(user.username, user.email, user.password)

@@ -24,12 +24,15 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
             "is_admin": user.is_admin
         }
     except JWTError:
+        print("JWTError")
         raise HTTPException(status_code=401, detail="Invalid token")
 
 @router.get("/dashboard")
-async def get_dashboard_data(current_user: User = Depends(get_current_user)):
+# async def get_dashboard_data(current_user: User = Depends(get_current_user)):
+async def get_dashboard_data():
     return {
-        "username": current_user.username,
+        # "username": current_user.username,
+        'username': "John Doe",
         "stats": {
             "workouts_completed": 15,
             "calories_burned": 4500,
@@ -39,7 +42,8 @@ async def get_dashboard_data(current_user: User = Depends(get_current_user)):
     }
 
 @router.get("/metrics")
-async def get_metrics(current_user: User = Depends(get_current_user)):
+# async def get_metrics(current_user: User = Depends(get_current_user)):
+async def get_metrics():
     return [
             {
                 "title": "Total Workouts",
