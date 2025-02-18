@@ -8,21 +8,7 @@ router = APIRouter()
 
 
 
-@router.get("/users")
-async def get_users(
-    db: Session = Depends(get_db),
-    skip: int = Query(0, ge=0),
-    limit: int = Query(10, ge=1),
-    search: str = Query(None)
-):
-    query = db.query(User)
-    
-    if search:
-        query = query.filter(User.username.contains(search) | User.email.contains(search))
-    
-    users = query.offset(skip).limit(limit).all()
-    
-    return [{'username': user.username, 'email': user.email, 'is_active': user.is_active, 'id': user.id} for user in users]
+
 @router.get("/users/{user_id}")
 async def get_user(user_id: int, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.id == user_id).first()
@@ -59,4 +45,29 @@ async def patch_user(user_id: int, user_data: UserUpdate, db: Session = Depends(
     user.is_active = user_data.is_active
     db.commit()
     return {"message": "User status updated successfully"}
+
+@router.get("/detailed-progress")
+async def get_detailed_progress(db: Session = Depends(get_db)):
+    """this returns the progress of the user"""
+    return {
+        "type": "bar",
+        "labels": ["January", "February", "March", "April", "May", "June", "July"],
+        "datasets": [
+            {
+                "label": "Weight",
+                "data": [65, 64, 63, 62, 61, 60, 59],
+                "borderColor": "rgba(255, 107, 53, 1)",
+                "backgroundColor": "rgba(255, 107, 53, 0.2)",
+                "fill": True
+            },
+            {
+                "label": "Body Fat Percentage",
+                "data": [20, 19, 18, 17, 16, 15, 14],
+                "borderColor": "rgba(76, 175, 80, 1)",
+                "backgroundColor": "rgba(76, 175, 80, 0.2)",
+                "fill": True
+            }
+        ]
+    }
+
 

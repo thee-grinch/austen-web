@@ -405,6 +405,8 @@
                 document.getElementById('loginForm').reset();
                 const data = await response.json();
                 console.log(data);
+                localStorage.setItem('token', data.access_token);
+                
                 if (data.is_admin === true) {
                     window.location.href = '/admin';
                 } else {

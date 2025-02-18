@@ -1,11 +1,12 @@
 
 from database.database import SessionLocal
 from database.models import Metric, Progress, Program, Workout, Trainer, Feedback, User
-from fastapi import APIRouter, Depends, HTTPException
-from schemas.user import UserUpdate
+from fastapi import APIRouter, Depends, HTTPException, Query
+from schemas.user import UserUpdate, UserPatch
 from schemas.workouts import TrainerCreate, WorkoutCreate
 from schemas.programs import ProgramCreate
 from sqlalchemy.orm import Session
+
 
 router = APIRouter()
 
@@ -15,13 +16,52 @@ def get_db():
         yield db
     finally:
         db.close()
-
+@router.get("/users")
+async def get_users(
+    db: Session = Depends(get_db),
+    skip: int = Query(0, ge=0),
+    limit: int = Query(10, ge=1),
+    search: str = Query(None)
+):
+    query = db.query(User)
+    
+    if search:
+        query = query.filter(User.username.contains(search) | User.email.contains(search))
+    
+    users = query.offset(skip).limit(limit).all()
+    
+    return [{'username': user.username, 'email': user.email, 'is_active': user.is_active, 'id': user.id} for user in users]
 @router.post("/users")
 async def create_user(user: UserUpdate, db: Session = Depends(get_db)):
     new_user = User(**user.dict())
     db.add(new_user)
     db.commit()
     return new_user
+
+@router.patch("/users/{user_id}")
+async def update_user(user_id: int, user: UserPatch, db: Session = Depends(get_db)):
+    User = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    if user.username:
+        user.username = user.username
+    if user.email:
+        User.email = user.email
+    if user.is_active:
+        User.is_active = user.is_active
+    if user.is_admin:
+        User.is_admin = user.is_admin
+    db.commit()
+    return user
+
+@router.patch("/{user_id}/toggle-admin")
+async def toggle_admin(user_id: int, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    user.is_admin = not user.is_admin
+    db.commit()
+    return user
 
 
 @router.get("/metrics")
@@ -35,6 +75,7 @@ async def get_metrics(db: Session = Depends(get_db)):
 
 @router.get("/progress")
 async def get_progress(db: Session = Depends(get_db)):
+    """this returns the progress of the user"""
     progress = db.query(Progress).all()
     return {
         "labels": [p.week for p in progress],

@@ -7,6 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <style>
         :root {
             --primary: #FF6B35;
@@ -259,7 +260,7 @@
             position: fixed;
             bottom: 90px;
             right: 20px;
-            width: 300px;
+            width: 500px;
             background: var(--light);
             border-radius: 10px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.3);
@@ -305,9 +306,24 @@
 
         .chatbot-message.bot {
             text-align: left;
+            ul {
+                list-style-type: none;
+                color: var(--light);
+                /* margin-left: 1.5rem; */
+            }
+
+            li {
+                margin-bottom: 0.5rem;
+            }
+
+            strong {
+                font-weight: 700;
+                color: var(--primary);
+            }
+            
         }
 
-        .chatbot-message p {
+        .chatbot-message span {
             background: var(--gray);
             color: var(--light);
             padding: 0.5rem 1rem;
@@ -378,6 +394,8 @@
         <div class="logo">FitPro</div>
         <nav class="nav-links">
             <a href="#"><i class="fas fa-bell notification-bell"></i></a>
+            <p id="username"></p>
+            
             <div class="profile-avatar"></div>
         </nav>
     </header>
@@ -395,10 +413,10 @@
         <button class="tablink" onclick="openTab(event, 'diet')">
             <i class="fas fa-utensils"></i> Diet Plans
         </button>
-        <button class="tablink" onclick="openTab(event, 'community')">
+        <!-- <button class="tablink" onclick="openTab(event, 'community')">
             <i class="fas fa-users"></i> Community
-        </button>
-        <button class="tablink" onclick="openTab(event, 'support')">
+        </button> -->
+        <button class="tablink" onclick="toggleChatbot()">
             <i class="fas fa-question-circle"></i> Support
         </button>
     </aside>
@@ -532,7 +550,7 @@
         </div>
         <div class="chatbot-body" id="chatbotBody">
             <div class="chatbot-message bot">
-                <p>Hi there! How can I help you today?</p>
+                <span>Hi there! How can I help you today?</span>
             </div>
             <div class="quick-replies">
                 <div class="quick-reply" onclick="sendQuickReply('Help me plan my workouts')">Plan Workouts</div>
@@ -551,6 +569,10 @@
         let charts = {};
         
         async function fetchData(endpoint) {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = '/signup';
+            }
             try {
                 const response = await fetch(`/api/${endpoint}`);
                 return await response.json();
@@ -646,12 +668,32 @@
             chatbotContainer.style.display = chatbotContainer.style.display === 'flex' ? 'none' : 'flex';
         }
 
-        function sendMessage() {
+       async function sendMessage() {
             const input = document.getElementById('chatbotInput');
             const message = input.value.trim();
             if (message) {
                 addMessage(message, 'user');
                 input.value = '';
+                async function sendMessageToAPI(message) {
+                    console.log('Sending message to API:', message);
+                    try {
+                        const response = await fetch('/api/chatbot', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ 'prompt' : message })
+                        });
+                        const data = await response.json();
+                        console.log(data);
+                       await addMessage(data.reply, 'bot');
+                    } catch (error) {
+                        console.error('Error sending message to API:', error);
+                        addMessage('Sorry, something went wrong. Please try again.', 'bot');
+                    }
+                }
+
+               await sendMessageToAPI(message);
                 setTimeout(() => {
                     addMessage("I'll help you with that!", 'bot');
                 }, 500);
@@ -669,7 +711,13 @@
             const chatbotBody = document.getElementById('chatbotBody');
             const messageDiv = document.createElement('div');
             messageDiv.classList.add('chatbot-message', sender);
-            messageDiv.innerHTML = `<p>${message}</p>`;
+            if (sender === 'bot') {
+                
+                messageDiv.innerHTML = message;
+                console.log(messageDiv.innerHTML)
+            } else {
+                messageDiv.innerHTML = `<span>${message}</span>`;
+            }
             chatbotBody.appendChild(messageDiv);
             chatbotBody.scrollTop = chatbotBody.scrollHeight;
         }

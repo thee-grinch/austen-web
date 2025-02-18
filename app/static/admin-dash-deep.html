@@ -499,15 +499,15 @@
       <h2>Add/Edit User</h2>
       <div class="form-group">
         <label class="form-label" for="user-username">Username</label>
-        <input class="form-input" type="text" id="user-username" required>
+        <input class="form-input" type="text" id="user-username" >
       </div>
       <div class="form-group">
         <label class="form-label" for="user-email">Email</label>
-        <input class="form-input" type="email" id="user-email" required>
+        <input class="form-input" type="email" id="user-email" >
       </div>
       <div class="form-group">
-        <label class="form-label" for="user-password">Password</label>
-        <input class="form-input" type="password" id="user-password" required>
+        <label class="form-label" for="user-admin">Admin</label>
+        <input class="form-input" type="checkbox" id="user-admin">
       </div>
       <div class="form-actions">
         <button type="button" class="btn" onclick="closeModal()">Cancel</button>
@@ -657,7 +657,7 @@
             <td>${user.email}</td>
             <td>${user.is_active ? 'Active' : 'Inactive'}</td>
             <td>
-              <button class="action-btn edit-btn" onclick="editUser(${user.id})">Edit</button>
+              <button class="action-btn edit-btn" onclick="toggleAdminStatus(${user.id})">Admin</button>
               <button class="action-btn delete-btn" onclick="toggleUserStatus(${user.id}, ${user.is_active})">
                 ${user.is_active ? 'Deactivate' : 'Activate'}
               </button>
@@ -714,7 +714,7 @@
             <td>${user.email}</td>
             <td>${user.is_active ? 'Active' : 'Inactive'}</td>
             <td>
-              <button class="action-btn edit-btn" onclick="editUser(${user.id})">Edit</button>
+              <button class="action-btn edit-btn" onclick="toggleAdminStatus(${user.id})">Admin</button>
               <button class="action-btn delete-btn" onclick="toggleUserStatus(${user.id}, ${user.is_active})">
                 ${user.is_active ? 'Deactivate' : 'Activate'}
               </button>
@@ -842,28 +842,28 @@
 
     // Form Handling Functions
     async function handleUserForm(event) {
-      event.preventDefault();
-      const formData = {
-        username: document.getElementById('user-username').value,
-        email: document.getElementById('user-email').value,
-        password: document.getElementById('user-password').value
-      };
+      // event.preventDefault();
+      // const formData = {
+      //   username: document.getElementById('user-username').value,
+      //   email: document.getElementById('user-email').value,
+      //   admin: document.getElementById('user-admin').checked
+      // };
 
-      try {
-        const response = await fetch('/api/admin/users', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(formData)
-        });
+      // try {
+      //   const response = await fetch('/api/admin/users', {
+      //     method: 'POST',
+      //     headers: { 'Content-Type': 'application/json' },
+      //     body: JSON.stringify(formData)
+      //   });
 
-        if (!response.ok) throw new Error('Failed to save user');
+      //   if (!response.ok) throw new Error('Failed to save user');
         
-        dataManager.showNotification('User saved successfully');
-        closeModal();
-        loadManageUsers();
-      } catch (error) {
-        dataManager.showNotification(error.message, 'error');
-      }
+      //   dataManager.showNotification('User saved successfully');
+      //   closeModal();
+      //   loadManageUsers();
+      // } catch (error) {
+      //   dataManager.showNotification(error.message, 'error');
+      // }
     }
 
     async function handleTrainerForm(event) {
@@ -918,11 +918,22 @@
     }
 
     // Updated Edit Functions
-    function editUser(userId) {
-      dataManager.fetchData(`users/${userId}`)
-        .then(user => showUserModal(user))
-        .catch(error => dataManager.showNotification(error.message, 'error'));
-    }
+    async function toggleAdminStatus(userId) {
+        try {
+          const response = await fetch(`/api/admin/${userId}/toggle-admin`, {
+            method: 'PATCH',
+          });
+
+          if (!response.ok) throw new Error('Failed to toggle admin status');
+
+          dataManager.showNotification('Admin status toggled successfully');
+          loadManageUsers();
+        } catch (error) {
+          dataManager.showNotification(error.message, 'error');
+        }
+      }
+
+     
 
     function editTrainer(trainerId) {
       dataManager.fetchData(`trainers/${trainerId}`)

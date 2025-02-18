@@ -4,5 +4,9 @@ jinja2
 python-dotenv
 sqlalchemy
 pydantic
+typing
 passlib[bcrypt]
 python-jose[cryptography]
+google-generativeai
+google
+markdown

@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from typing import Optional
 
 class userCreate(BaseModel):
     username: str
@@ -24,4 +25,10 @@ class TrainerCreate(BaseModel):
     name: str
     specialization: str
     contact: str
+
+class UserPatch(BaseModel):
+    is_active: Optional[bool]
+    is_admin: Optional[bool]
+    username: Optional[str]
+    email: Optional[str]
 

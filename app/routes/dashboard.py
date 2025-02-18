@@ -18,16 +18,18 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
         user = db.query(User).filter(User.email == email).first()
         if not user:
             raise HTTPException(status_code=401, detail="Invalid user")
-        return user
+        return {
+            "username": user.username,
+            "email": user.email,
+            "is_admin": user.is_admin
+        }
     except JWTError:
         raise HTTPException(status_code=401, detail="Invalid token")
 
 @router.get("/dashboard")
-# async def get_dashboard_data(current_user: User = Depends(get_current_user)):
-async def get_dashboard_data():
+async def get_dashboard_data(current_user: User = Depends(get_current_user)):
     return {
-        # "username": current_user.username,
-        "username": "John Doe",
+        "username": current_user.username,
         "stats": {
             "workouts_completed": 15,
             "calories_burned": 4500,
@@ -37,8 +39,7 @@ async def get_dashboard_data():
     }
 
 @router.get("/metrics")
-# async def get_metrics(current_user: User = Depends(get_current_user)):
-async def get_metrics():
+async def get_metrics(current_user: User = Depends(get_current_user)):
     return [
             {
                 "title": "Total Workouts",
@@ -61,7 +62,6 @@ async def get_metrics():
                 "icon": "fas fa-weight"
             }
         ]
-
 @router.get("/progress")
 async def get_progress():
 # async def get_progress(current_user: User = Depends(get_current_user)):
@@ -98,7 +98,7 @@ async def get_programs():
             "progress": 0.3
         },
         {
-            "name": "Marathon Training",
+            "name": "Cardio Training",
             "description": "A 12-week program to help you run a marathon",
             "progress": 0.1
         },
